@@ -2,7 +2,7 @@
 import { saveServices } from '../utils/serviceUtils.js';
 import { saveBookings } from '../utils/bookingUtils.js';
 import { saveBlockedDates } from '../utils/blockedDatesUtils.js';
-import { initRedisClient } from '../utils/redis.js';
+import { initRedisClient, REDIS_KEYS } from '../utils/redis.js';
 
 // Default services data
 const DEFAULT_SERVICES = [
@@ -114,15 +114,13 @@ async function initializeRedis() {
       redisInitialized = true;
     } catch (error) {
       console.warn('⚠️ Redis initialization failed:', error.message);
-      throw error;
+      // Don't throw - allow operation to continue, actual Redis operations will handle errors
     }
   }
 }
 
 export default async function handler(req, res) {
-  await initializeRedis();
-
-  // Enable CORS
+  // Enable CORS first (before any async operations)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -139,7 +137,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Initialize Redis (won't throw, just logs warning)
+    await initializeRedis();
+
+    const KEY_PREFIX = process.env.REDIS_KEY_PREFIX || 'heyu';
     console.log('🚀 Starting data initialization...');
+    console.log(`📍 Using Redis key prefix: ${KEY_PREFIX}`);
+    console.log(`📍 Keys will be: ${REDIS_KEYS.SERVICES}, ${REDIS_KEYS.BOOKINGS}, ${REDIS_KEYS.BLOCKED_DATES}`);
     const { type, data } = req.body || {};
     
     const results = {
