@@ -137,6 +137,17 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Check environment variables
+    const hasKvUrl = !!process.env.KV_REST_API_URL;
+    const hasKvToken = !!process.env.KV_REST_API_TOKEN;
+    const hasKvUrlVar = !!process.env.KV_URL;
+    
+    console.log('🔍 Environment check:');
+    console.log(`  KV_REST_API_URL: ${hasKvUrl ? '✅ Set' : '❌ Missing'}`);
+    console.log(`  KV_REST_API_TOKEN: ${hasKvToken ? '✅ Set' : '❌ Missing'}`);
+    console.log(`  KV_URL: ${hasKvUrlVar ? '✅ Set' : '❌ Missing'}`);
+    console.log(`  REDIS_KEY_PREFIX: ${process.env.REDIS_KEY_PREFIX || 'not set (using default: heyu)'}`);
+
     // Initialize Redis (won't throw, just logs warning)
     await initializeRedis();
 
@@ -175,7 +186,8 @@ export default async function handler(req, res) {
       }
     } catch (error) {
       console.error('❌ Failed to initialize services:', error);
-      results.services.error = error.message;
+      console.error('❌ Error stack:', error.stack);
+      results.services.error = error.message || String(error);
     }
 
     // Initialize Bookings (if provided)
@@ -213,7 +225,13 @@ export default async function handler(req, res) {
     return res.json({
       success: allSuccess,
       message: 'Data initialization completed',
-      results: results
+      results: results,
+      envCheck: {
+        hasKvRestApiUrl: !!process.env.KV_REST_API_URL,
+        hasKvRestApiToken: !!process.env.KV_REST_API_TOKEN,
+        hasKvUrl: !!process.env.KV_URL,
+        redisKeyPrefix: process.env.REDIS_KEY_PREFIX || 'heyu (default)'
+      }
     });
   } catch (error) {
     console.error('❌ Data initialization error:', error);
