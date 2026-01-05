@@ -1,0 +1,475 @@
+.timeSelectionPage {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+.mainContent {
+  display: flex;
+  justify-content: space-between;
+  gap: 150px;
+  margin-top: var(--spacing-md);
+}
+
+.selectionPanel {
+  background-color: var(--color-secondary);
+  margin-left: 50px;
+  flex: 2;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.breadcrumbLink {
+  color: var(--color-text-light);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.breadcrumbLink:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.separator {
+  color: var(--color-text-light);
+}
+
+.active {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-primary);
+}
+
+.staffSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text);
+}
+
+
+.calendarSection {
+  margin-bottom: var(--spacing-lg);
+  
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.navButton {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-secondary-light);
+  color: var(--color-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.navButton:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-background-light);
+}
+
+.monthTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.weekDay {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-light);
+  padding: var(--spacing-xs);
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-xs);
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendarDay:hover:not(.past):not(.selected) {
+  border-color: var(--color-primary);
+  background-color: var(--color-background-light);
+}
+
+.calendarDay.today {
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.calendarDay.selected {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 600;
+}
+
+.calendarDay.past {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: rgba(0,0,0,0.2);
+}
+
+.timeSection {
+  margin-bottom: var(--spacing-md);
+}
+
+.timeSlots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.noSlotsMessage {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  text-align: center;
+  color: var(--color-text-light);
+  font-size: 0.95rem;
+  background-color: var(--color-secondary-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.timeSlot {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-secondary-light );
+  color: var(--color-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 155px;
+}
+
+.timeSlot:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-background-light);
+}
+
+.timeSlot.selected {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.waitlistLink {
+  margin-top: var(--spacing-md);
+}
+
+.waitlistLink a {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.waitlistLink a:hover {
+  opacity: 0.7;
+}
+
+.summaryPanel {
+  background-color: var(--color-secondary-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+  margin-right: 50px;
+  flex:1;
+}
+
+.businessInfo {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.businessName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-serif);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.businessRating {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stars {
+  color: #fbbf24;
+  font-size: 0.9rem;
+}
+
+.ratingText {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.businessAddress {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.serviceSummary {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summaryTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.serviceItem {
+  background-color: var(--color-secondary);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.serviceName {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.serviceMeta {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-xs);
+}
+
+.servicePrice {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  font-family: var(--font-serif);
+}
+
+.totalSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+}
+
+.totalLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.totalPrice {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  font-family: var(--font-serif);
+}
+
+.continueButton {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+
+}
+
+.continueButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .mainContent {
+    flex-direction: column;
+  }
+
+  .summaryPanel {
+    position: static;
+    margin-top: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-sm) var(--spacing-sm);
+  }
+  
+  .mainContent {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding-bottom: 120px; /* 为底部固定栏留出空间 */
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .selectionPanel {
+    margin-left: 0;
+  }
+
+  .summaryPanel {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top:auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: var(--spacing-sm);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+
+  .continueButton {
+    flex: 1;
+margin: 0;}
+
+
+  .businessInfo {
+    display: none;
+  }
+
+  .serviceSummary {
+    flex:3;
+    margin: 0;
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .summaryTitle {
+    display: none;
+  }
+
+  .serviceItem {
+    background-color: transparent;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin:0;
+  }
+
+  .serviceName {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    flex: 1;
+  }
+
+  .servicePrice {
+    font-size: 1rem;
+    margin-left: var(--spacing-sm);
+  }
+
+  .totalSection {
+    display: none;
+  }
+
+  .continueButton {
+    width: 100%;
+    margin-top: var(--spacing-xs);
+  }
+
+  .calendarGrid {
+    gap: 4px;
+  }
+
+  .calendarDay {
+    font-size: 0.85rem;
+  }
+
+  .weekDays {
+    gap: 0;
+  }
+  .weekDay {
+    font-size: 0.8rem;
+  }
+
+  .timeSlots {
+    gap: 6px;
+  }
+
+  .timeSlot {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+

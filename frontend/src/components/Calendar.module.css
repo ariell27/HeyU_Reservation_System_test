@@ -1,0 +1,165 @@
+.calendarSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.navButton {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-secondary-light);
+  color: var(--color-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.navButton:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.monthTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  font-family: var(--font-serif);
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.weekDay {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-light);
+  padding: var(--spacing-xs);
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-xs);
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-secondary-light);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: var(--spacing-xs);
+}
+
+.calendarDay:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background-color: var(--color-background-light);
+}
+
+.calendarDay.today {
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.calendarDay.selected {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 600;
+}
+
+.calendarDay.past {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.calendarDay.blocked {
+  background-color: #fee2e2;
+  border-color: #e74c3c;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.calendarDay.hasBookings {
+  border-color: var(--color-accent);
+}
+
+.calendarDay:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dayNumber {
+  font-size: 0.9rem;
+}
+
+.bookingBadge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: var(--color-accent);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .calendarGrid {
+    gap: 4px;
+  }
+
+  .calendarDay {
+    font-size: 0.85rem;
+    padding: 2px;
+  }
+
+  .bookingBadge {
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+  }
+
+  .weekDays {
+    gap: 0;
+  }
+
+  .weekDay {
+    font-size: 0.8rem;
+  }
+}
+
