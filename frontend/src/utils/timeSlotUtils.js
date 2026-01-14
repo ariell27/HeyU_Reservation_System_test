@@ -1,40 +1,40 @@
 /**
- * 时间槽工具函数
- * 统一管理时间槽生成和验证逻辑
+ * Time slot utility functions
+ * Unified management of time slot generation and validation logic
  */
 
-// 从服务时长字符串中提取小时数
+// Extract hours from service duration string
 export const parseDuration = (duration) => {
-  if (!duration) return 3; // 默认3小时
+  if (!duration) return 3; // Default 3 hours
   const match = duration.match(/(\d+)\s*小时/);
   return match ? parseInt(match[1], 10) : 3;
 };
 
-// 根据日期获取营业结束时间
+// Get business closing hour based on date
 export const getEndHour = (date) => {
-  if (!date) return 19; // 默认19:00
-  const dayOfWeek = date.getDay(); // 0 = 周日, 1 = 周一, 2 = 周二, 3 = 周三, 4 = 周四, 5 = 周五, 6 = 周六
-  // 周二和周四：22:00，其他日期：19:00
+  if (!date) return 19; // Default 19:00
+  const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
+  // Tuesday and Thursday: 22:00, other days: 19:00
   return dayOfWeek === 2 || dayOfWeek === 4 ? 22 : 19;
 };
 
-// 检查时间段是否有足够的时长完成服务
+// Check if time slot has sufficient duration to complete the service
 export const isTimeSlotValid = (time, serviceDuration, endHour) => {
   const [hours] = time.split(":").map(Number);
-  // 检查开始时间加上服务时长是否超过营业结束时间
+  // Check if start time plus service duration exceeds business closing time
   return hours + serviceDuration <= endHour;
 };
 
-// 判断是否为周二/周四18:00之后
+// Check if it's after 18:00 on Tuesday/Thursday
 export const isEveningTime = (time, date) => {
   if (!date) return false;
   const dayOfWeek = date.getDay();
-  if (dayOfWeek !== 2 && dayOfWeek !== 4) return false; // 不是周二或周四
+  if (dayOfWeek !== 2 && dayOfWeek !== 4) return false; // Not Tuesday or Thursday
   const [hours] = time.split(":").map(Number);
-  return hours >= 18; // 18:00及之后
+  return hours >= 18; // 18:00 and later
 };
 
-// 检查时间槽是否与已预订冲突
+// Check if time slot conflicts with existing bookings
 export const isTimeSlotBooked = (time, bookings, serviceDuration) => {
   if (!bookings || bookings.length === 0) return false;
 
@@ -42,27 +42,27 @@ export const isTimeSlotBooked = (time, bookings, serviceDuration) => {
   const timeEnd = timeHours + serviceDuration;
 
   return bookings.some((booking) => {
-    // 从后端返回的预订数据中获取时间：selectedTime 或 time 或 startTime
+    // Get time from backend booking data: selectedTime or time or startTime
     const bookingTime =
       booking.selectedTime || booking.time || booking.startTime;
     if (!bookingTime) return false;
 
     const [bookingStartHours] = bookingTime.split(":").map(Number);
-    // 从服务对象中获取时长，如果没有则使用默认值
+    // Get duration from service object, use default value if not available
     const bookingDuration = booking.service?.duration
       ? parseDuration(booking.service.duration)
       : booking.serviceDuration || parseDuration(booking.duration) || 3;
     const bookingEnd = bookingStartHours + bookingDuration;
 
-    // 冲突条件：时间槽开始时间 < 预订结束时间 且 时间槽开始时间 + 服务时长 > 预订开始时间
+    // Conflict condition: time slot start < booking end AND time slot start + service duration > booking start
     return timeHours < bookingEnd && timeEnd > bookingStartHours;
   });
 };
 
 /**
- * 将日期对象转换为本地日期字符串 (YYYY-MM-DD)，避免时区问题
- * @param {Date} date - 日期对象
- * @returns {string} 本地日期字符串
+ * Convert date object to local date string (YYYY-MM-DD), avoiding timezone issues
+ * @param {Date} date - Date object
+ * @returns {string} Local date string
  */
 export const formatDateToLocalString = (date) => {
   if (!date) return "";
@@ -72,47 +72,47 @@ export const formatDateToLocalString = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// 检查时间槽是否被 block
+// Check if time slot is blocked
 export const isTimeSlotBlocked = (time, date, blockedDates) => {
   if (!date || !blockedDates || blockedDates.length === 0) return false;
 
-  // 使用本地日期字符串，避免时区问题
+  // Use local date string to avoid timezone issues
   const dateStr = formatDateToLocalString(date);
   const blockedDate = blockedDates.find((bd) => bd.date === dateStr);
 
   if (!blockedDate) return false;
 
-  // 如果 times 数组为空，表示整个日期被 block
+  // If times array is empty, the entire date is blocked
   if (!blockedDate.times || blockedDate.times.length === 0) {
     return true;
   }
 
-  // 检查特定时间段是否被 block
-  // 对于 block 的时间段，我们需要检查时间槽是否与 block 的时间段重叠
-  // 这里假设 block 的时间段是精确的时间点，如果时间槽的开始时间匹配，则被 block
+  // Check if specific time period is blocked
+  // For blocked time periods, we need to check if the time slot overlaps with the blocked time period
+  // Here we assume blocked time periods are precise time points, if the time slot start time matches, it's blocked
   return blockedDate.times.includes(time);
 };
 
 /**
- * 生成默认时间槽（用于预约界面和管理界面）
- * 根据服务时长显示不同的默认时间槽：
- * - 5小时服务：["09:00", "14:00"]
- * - 3小时服务：["09:00", "12:00", "15:00"]，周二/周四还会包含 "18:00"
- * @param {Date} date - 日期（可选，用于确定是否包含18:00）
- * @param {number} serviceDuration - 服务时长（小时）
- * @returns {Array<string>} 默认时间槽数组
+ * Generate default time slots (for booking interface and admin interface)
+ * Display different default time slots based on service duration:
+ * - 5-hour service: ["09:00", "14:00"]
+ * - 3-hour service: ["09:00", "12:00", "15:00"], also includes "18:00" on Tuesday/Thursday
+ * @param {Date} date - Date (optional, used to determine if 18:00 should be included)
+ * @param {number} serviceDuration - Service duration (hours)
+ * @returns {Array<string>} Default time slot array
  */
 export const generateDefaultTimeSlots = (date = null, serviceDuration = 3) => {
   let defaultSlots;
   
   if (serviceDuration === 5) {
-    // 5小时服务：显示 9:00 和 14:00
+    // 5-hour service: display 9:00 and 14:00
     defaultSlots = ["09:00", "14:00"];
   } else {
-    // 3小时服务：显示 9:00、12:00、15:00
+    // 3-hour service: display 9:00, 12:00, 15:00
     defaultSlots = ["09:00", "12:00", "15:00"];
     
-    // 如果是周二或周四，且服务是3小时，添加18:00
+    // If it's Tuesday or Thursday, and service is 3 hours, add 18:00
     if (date) {
       const dayOfWeek = date.getDay();
       if (dayOfWeek === 2 || dayOfWeek === 4) {
@@ -125,18 +125,18 @@ export const generateDefaultTimeSlots = (date = null, serviceDuration = 3) => {
 };
 
 /**
- * 生成所有可能的时间槽（用于管理界面）
- * @param {Date} date - 日期（可选，用于确定营业时间）
- * @param {Object} options - 配置选项
- * @param {number} options.startHour - 开始小时（默认 9）
- * @param {number} options.endHour - 结束小时（默认根据日期计算，或使用传入值）
- * @param {number} options.interval - 时间间隔（分钟，默认 30）
- * @returns {Array<string>} 时间槽数组，格式为 ["09:00", "09:30", ...]
+ * Generate all possible time slots (for admin interface)
+ * @param {Date} date - Date (optional, used to determine business hours)
+ * @param {Object} options - Configuration options
+ * @param {number} options.startHour - Start hour (default 9)
+ * @param {number} options.endHour - End hour (default calculated based on date, or use provided value)
+ * @param {number} options.interval - Time interval (minutes, default 30)
+ * @returns {Array<string>} Time slot array, format: ["09:00", "09:30", ...]
  */
 export const generateAllTimeSlots = (date = null, options = {}) => {
   const { startHour = 9, endHour = null, interval = 30 } = options;
 
-  // 如果没有指定 endHour，根据日期计算
+  // If endHour is not specified, calculate based on date
   const finalEndHour = endHour !== null ? endHour : getEndHour(date);
 
   const slots = [];
@@ -154,12 +154,12 @@ export const generateAllTimeSlots = (date = null, options = {}) => {
 };
 
 /**
- * 生成可用时间槽（用于预约界面，考虑预订和 block）
- * @param {Date} date - 日期
- * @param {Object} service - 服务对象
- * @param {Array} bookings - 预订列表
- * @param {Array} blockedDates - 被屏蔽的日期列表
- * @returns {Array<string>} 可用时间槽数组
+ * Generate available time slots (for booking interface, considering bookings and blocks)
+ * @param {Date} date - Date
+ * @param {Object} service - Service object
+ * @param {Array} bookings - Booking list
+ * @param {Array} blockedDates - Blocked dates list
+ * @returns {Array<string>} Available time slot array
  */
 export const generateAvailableTimeSlots = (
   date,
@@ -167,24 +167,24 @@ export const generateAvailableTimeSlots = (
   bookings = [],
   blockedDates = []
 ) => {
-  const slotsSet = new Set(); // 使用Set去重
-  const endHour = getEndHour(date); // 根据日期获取结束时间
+  const slotsSet = new Set(); // Use Set to remove duplicates
+  const endHour = getEndHour(date); // Get end time based on date
 
   if (!service) {
-    // 如果没有选择服务，返回空数组
+    // If no service is selected, return empty array
     return [];
   }
 
-  // 检查整个日期是否被 block
+  // Check if the entire date is blocked
   if (isTimeSlotBlocked("00:00", date, blockedDates)) {
     return [];
   }
 
   const serviceDuration = parseDuration(service.duration);
-  // 根据服务时长生成默认时间槽
+  // Generate default time slots based on service duration
   const defaultSlots = generateDefaultTimeSlots(date, serviceDuration);
 
-  // 1. 如果没有预订，返回默认时间槽
+  // 1. If there are no bookings, return default time slots
   if (!bookings || bookings.length === 0) {
     defaultSlots.forEach((time) => {
       if (
@@ -199,8 +199,8 @@ export const generateAvailableTimeSlots = (
     return slots;
   }
 
-  // 2. 如果有预订，动态计算可用时间槽
-  // 2.1 添加默认时间槽（如果有效且不与预订冲突且不被 block）
+  // 2. If there are bookings, dynamically calculate available time slots
+  // 2.1 Add default time slots (if valid, not conflicting with bookings, and not blocked)
   defaultSlots.forEach((time) => {
     if (
       isTimeSlotValid(time, serviceDuration, endHour) &&
@@ -211,27 +211,27 @@ export const generateAvailableTimeSlots = (
     }
   });
 
-  // 2.2 如果默认时间槽中已经包含18:00（3小时服务在周二/周四），则不需要单独添加
-  // 因为 generateDefaultTimeSlots 已经处理了18:00的添加逻辑
+  // 2.2 If default time slots already include 18:00 (3-hour service on Tuesday/Thursday), no need to add separately
+  // because generateDefaultTimeSlots already handles the 18:00 addition logic
 
-  // 2.3 对于每个预订，计算上一个和下一个可用时间
+  // 2.3 For each booking, calculate previous and next available times
   bookings.forEach((booking) => {
-    // 从后端返回的预订数据中获取时间：selectedTime 或 time 或 startTime
+    // Get time from backend booking data: selectedTime or time or startTime
     const bookingTime =
       booking.selectedTime || booking.time || booking.startTime;
-    if (!bookingTime) return; // 如果没有时间，跳过这个预订
+    if (!bookingTime) return; // If no time, skip this booking
 
     const [bookingStartHours] = bookingTime.split(":").map(Number);
-    // 从服务对象中获取时长，如果没有则使用默认值
+    // Get duration from service object, use default value if not available
     const bookingDuration = booking.service?.duration
       ? parseDuration(booking.service.duration)
       : booking.serviceDuration || parseDuration(booking.duration) || 3;
     const bookingEnd = bookingStartHours + bookingDuration;
 
-    // 计算上一个可用时间：从默认时间槽中找到满足条件的
+    // Calculate previous available time: find from default time slots that meet the condition
     defaultSlots.forEach((defaultTime) => {
       const [defaultHours] = defaultTime.split(":").map(Number);
-      // 上一个可用时间条件：defaultTime + serviceDuration <= bookingStartHours
+      // Previous available time condition: defaultTime + serviceDuration <= bookingStartHours
       if (defaultHours + serviceDuration <= bookingStartHours) {
         if (
           isTimeSlotValid(defaultTime, serviceDuration, endHour) &&
@@ -243,56 +243,56 @@ export const generateAvailableTimeSlots = (
       }
     });
 
-    // 计算下一个可用时间：预订结束时间
+    // Calculate next available time: booking end time
     const nextAvailableTime = `${bookingEnd.toString().padStart(2, "0")}:00`;
     if (
       isTimeSlotValid(nextAvailableTime, serviceDuration, endHour) &&
       !isTimeSlotBooked(nextAvailableTime, bookings, serviceDuration) &&
       !isTimeSlotBlocked(nextAvailableTime, date, blockedDates)
     ) {
-      // 检查是否为周二/周四晚上（18:00之后），如果是且服务是5小时，则不添加
+      // Check if it's Tuesday/Thursday evening (after 18:00), if yes and service is 5 hours, don't add
       if (!(isEveningTime(nextAvailableTime, date) && serviceDuration === 5)) {
         slotsSet.add(nextAvailableTime);
       }
     }
   });
 
-  // 2.4 过滤冲突：移除与预订冲突或被 block 的时间槽
-  // 同时检查时间间隔：如果时间槽与最近的预订结束时间的间隔小于服务时长，则不显示
+  // 2.4 Filter conflicts: remove time slots that conflict with bookings or are blocked
+  // Also check time intervals: if the interval between time slot and nearest booking end time is less than service duration, don't display
   const finalSlots = Array.from(slotsSet).filter((time) => {
-    // 检查是否被 block
+    // Check if blocked
     if (isTimeSlotBlocked(time, date, blockedDates)) {
       return false;
     }
 
-    // 检查是否与预订冲突
+    // Check if conflicts with bookings
     if (isTimeSlotBooked(time, bookings, serviceDuration)) {
       return false;
     }
 
-    // 检查是否为周二/周四晚上（18:00之后），如果是且服务是5小时，则不显示
+    // Check if it's Tuesday/Thursday evening (after 18:00), if yes and service is 5 hours, don't display
     if (isEveningTime(time, date) && serviceDuration === 5) {
       return false;
     }
 
-    // 检查是否有足够的时长
+    // Check if there's sufficient duration
     if (!isTimeSlotValid(time, serviceDuration, endHour)) {
       return false;
     }
 
     const [timeHours] = time.split(":").map(Number);
 
-    // 检查18点之前开始的场次必须在19:00及之前结束
-    // 如果时间槽在18:00之前开始，那么它必须在19:00之前结束
+    // Check that sessions starting before 18:00 must end by 19:00
+    // If time slot starts before 18:00, it must end before 19:00
     if (timeHours < 18) {
       if (timeHours + serviceDuration > 19) {
-        return false; // 18点之前开始的场次不能在19:00之后结束
+        return false; // Sessions starting before 18:00 cannot end after 19:00
       }
     }
 
-    // 检查时间间隔：如果时间槽与最近的预订结束时间的间隔小于服务时长，则不显示
+    // Check time interval: if the interval between time slot and nearest booking end time is less than service duration, don't display
     
-    // 找到所有预订的结束时间
+    // Find all booking end times
     const bookingEndTimes = [];
     bookings.forEach((booking) => {
       const bookingTime =
@@ -306,18 +306,18 @@ export const generateAvailableTimeSlots = (
       bookingEndTimes.push(bookingEnd);
     });
 
-    // 如果时间槽在某个预订结束时间之后，检查间隔
-    // 但18:00是周二/周四的特殊时间槽，不受间隔限制
+    // If time slot is after a booking end time, check interval
+    // But 18:00 is a special time slot on Tuesday/Thursday, not subject to interval restrictions
     const is18Slot = timeHours === 18;
     const isTuesdayOrThursday = date && (date.getDay() === 2 || date.getDay() === 4);
     
     if (!(is18Slot && isTuesdayOrThursday)) {
-      // 对于非18:00时间槽，或者非周二/周四，检查间隔
+      // For non-18:00 time slots, or non-Tuesday/Thursday, check interval
       for (const bookingEnd of bookingEndTimes) {
         if (timeHours > bookingEnd) {
-          // 计算间隔（小时）
+          // Calculate interval (hours)
           const interval = timeHours - bookingEnd;
-          // 如果间隔小于服务时长，则不显示（除非时间槽就是预订结束时间本身）
+          // If interval is less than service duration, don't display (unless the time slot is the booking end time itself)
           if (interval < serviceDuration) {
             return false;
           }
@@ -328,6 +328,6 @@ export const generateAvailableTimeSlots = (
     return true;
   });
 
-  // 转换为数组并排序
+  // Convert to array and sort
   return finalSlots.sort();
 };
